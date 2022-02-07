@@ -1,18 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: myapp-argo-application
+  name: argo-application
   namespace: argocd
 spec:
   project: default
 
   source:
-    repoURL: https://github.com/EudaldGM/GKEDEP
+    repoURL: https://github.com/EudaldGM/GKEDEP/prod
     targetRevision: HEAD
     path: prod
   destination: 
     server: https://kubernetes.default.svc
-    namespace: myapp
 
   syncPolicy:
     syncOptions:
