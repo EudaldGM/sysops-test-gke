@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/EudaldGM/GKEDEP/prod
+    repoURL: https://github.com/EudaldGM/GKEDEP
     targetRevision: HEAD
     path: prod
   destination: 
