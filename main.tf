@@ -1,31 +1,18 @@
 locals {
   cluster_name = "${terraform.workspace}-${var.cluster_name}"
 }
-
 #begin by deploying the cluster
-resource "google_service_account" "main" {
-  account_id   = "${local.cluster_name}-sa"
-  display_name = "GKE Cluster ${local.cluster_name} Service Account"
-}
-
-resource "google_container_cluster" "main" {
-  name               = local.cluster_name
-  location           = "europe-west1"
-  initial_node_count = 3
-  node_config {
-    service_account = google_service_account.main.email
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
+module "gke" {
+  source = "./gke-module/"
+  cluster_name = local.cluster_name
 }
 
 #get cluster authorization to send kubectl orders
 module "gke_auth" {
-  depends_on           = [google_container_cluster.main]
+  depends_on           = [module.gke]
   source               = "terraform-google-modules/kubernetes-engine/google//modules/auth"
   project_id           = "w38-eguillen"
-  cluster_name         = google_container_cluster.main.name
+  cluster_name         = local.cluster_name
   location             = "europe-west1"
   use_private_endpoint = false
 }
