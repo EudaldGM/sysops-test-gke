@@ -1,21 +1,3 @@
-# define where everything is located.
-data "kubectl_file_documents" "namespace" {
-  content = file("./argostuff/arcd-namespace.yaml")
-}
-
-data "kubectl_file_documents" "argocd" {
-  content = file("./argostuff/argocd.yaml")
-}
-
-#data "kubectl_file_documents" "argo-app" {
-#  content = file("./argostuff/argoapp.yaml")
-#}
-
-
-
-
-
-
 locals {
   cluster_name = "${terraform.workspace}-${var.cluster_name}"
 }
@@ -48,6 +30,17 @@ module "gke_auth" {
   use_private_endpoint = false
 }
 
+
+# define where everything is located.
+data "kubectl_file_documents" "namespace" {
+  content = file("./argostuff/arcd-namespace.yaml")
+}
+
+data "kubectl_file_documents" "argocd" {
+  content = file("./argostuff/argocd.yaml")
+}
+
+
 #begin deploying kubectl manifests with the argo namespace, install file, and app file.
 resource "kubectl_manifest" "namespace" {
   count              = length(data.kubectl_file_documents.namespace.documents)
@@ -64,17 +57,12 @@ resource "kubectl_manifest" "argocd" {
   override_namespace = "argocd"
 }
 
-#resource "kubectl_manifest" "argo-app" {
-#  depends_on = [
-#    kubectl_manifest.argocd,
-#  ]
-#  count              = length(data.kubectl_file_documents.argo-app.documents)
-#  yaml_body          = element(data.kubectl_file_documents.argo-app.documents, count.index)
-#  override_namespace = "argocd"
-#}
-
 resource "kubectl_manifest" "argo-app" {
+  depends_on = [
+    kubectl_manifest.argocd,
+  ]
   yaml_body = templatefile("./argostuff/argoapp.yaml", {
     env = terraform.workspace
   })
+  override_namespace = "argocd"
 }
