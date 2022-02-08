@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-app
+  namespace: api
+spec:
+  selector:
+    matchLabels:
+      app: api-app
+  replicas: 2 
+  template:
+    metadata:
+      labels:
+        app: api-app
+    spec:
+      containers:
+      - name: api-app
+        image: gcr.io/google_containers/echoserver:1.4
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-app-svc
+spec:
+  type: NodePort  
+  selector:
+    app: api-app
+  ports:
+    - port: 80

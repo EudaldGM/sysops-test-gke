@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/EudaldGM/GKEDEP
     targetRevision: HEAD
-    path: prod
+    path: ${env}
   destination: 
     server: https://kubernetes.default.svc
     namespace: default
